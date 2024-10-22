@@ -62,10 +62,16 @@ jobs:
         run: |
           cosign download attestation ${{ vars.CGR_REGISTRY }}/${{ matrix.image }} | jq -r .payload | base64 -d | jq .predicate >> sbom.json
 
+      - name: Cut the tag from the image name
+        shell: bash
+        id: image-name
+        run: |
+          echo "IMAGE_TAG=$(echo ${{ matrix.image }} | cut -d: -f2)" >> $GITHUB_ENV
+
       - name: Upload SBOM and attestation
         uses: actions/upload-artifact@v4
         with:
-          name: sbom-attestation
+          name: ${{ steps.image-name.outputs.IMAGE_TAG }}
           path: |
             sbom.json
             attestation.json
