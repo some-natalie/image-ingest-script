@@ -71,5 +71,5 @@ jobs:
           go install github.com/chainguard-dev/incert@latest
           incert \
             -ca-certs-file test.crt \
-            -image-url $UPSTREAM_REGISTRY$image \
-            -dest-image-url $DOWNSTREAM_REGISTRY$image
+            -image-url ${{ vars.CGR_REGISTRY }}/${{ matrix.image }} \
+            -dest-image-url ghcr.io/${{ github.repository }}/${{ matrix.image }}
