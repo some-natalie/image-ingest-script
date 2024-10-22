@@ -60,14 +60,14 @@ jobs:
       - name: Download SBOM
         shell: bash
         run: |
-          cosign download attestation ${{ vars.CGR_REGISTRY }}/${{ matrix.image }} | jq -r .payload | base64 -d | jq .predicate >> $(${{ matrix.image }} | cut -d: -f1 ).json
+          cosign download attestation ${{ vars.CGR_REGISTRY }}/${{ matrix.image }} | jq -r .payload | base64 -d | jq .predicate >> sbom.json
 
       - name: Upload SBOM and attestation
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.image }}
+          name: sbom-attestation
           path: |
-            ${{ matrix.image }}.json
+            sbom.json
             attestation.json
 
       - name: Setup go
