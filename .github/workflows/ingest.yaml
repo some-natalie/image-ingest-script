@@ -1,0 +1,59 @@
+name: Mirror workflow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image:
+          [
+            python:3.10,
+            python:3.10-dev,
+            postgres:14,
+            postgres:16,
+            node:latest,
+            trino:453,
+          ]
+    continue-on-error: true
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up incert
+        shell: bash
+        run: |
+          go install github.com/chainguard-dev/incert@latest
+
+      - name: Scan image
+        uses: anchore/scan-action@v3
+        with:
+          image: ${{ vars.CGR_REGISTRY }}/${{ matrix.image }}
+          fail-build: true
+          severity-cutoff: medium
+
+      - name: Verify attestation
+        shell: bash
+        run: |
+          cosign verify \
+              --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
+              --certificate-identity=https://github.com/chainguard-images/images-private/.github/workflows/release.yaml@refs/heads/main \
+          ${{ vars.CGR_REGISTRY }}/${{ matrix.image }} | jq >> $GITHUB_STEP_SUMMARY
+
+      - name: Download SBOM
+        shell: bash
+        run: |
+          cosign download attestation ${{ vars.CGR_REGISTRY }}/${{ matrix.image }} | jq -r .payload | base64 -d | jq .predicate >> $GITHUB_STEP_SUMMARY
+
+      - name: Run incert and push
+        shell: bash
+        run: |
+          incert \
+            -ca-certs-file test.crt \
+            -image-url $UPSTREAM_REGISTRY$image \
+            -dest-image-url $DOWNSTREAM_REGISTRY$image
