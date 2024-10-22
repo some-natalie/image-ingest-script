@@ -55,12 +55,20 @@ jobs:
           cosign verify \
               --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
               --certificate-identity=https://github.com/chainguard-images/images-private/.github/workflows/release.yaml@refs/heads/main \
-          ${{ vars.CGR_REGISTRY }}/${{ matrix.image }} | jq >> $GITHUB_STEP_SUMMARY
+          ${{ vars.CGR_REGISTRY }}/${{ matrix.image }} | jq > attestation.json
 
       - name: Download SBOM
         shell: bash
         run: |
-          cosign download attestation ${{ vars.CGR_REGISTRY }}/${{ matrix.image }} | jq -r .payload | base64 -d | jq .predicate >> $GITHUB_STEP_SUMMARY
+          cosign download attestation ${{ vars.CGR_REGISTRY }}/${{ matrix.image }} | jq -r .payload | base64 -d | jq .predicate >> ${{ matrix.image }}.json
+
+      - name: Upload SBOM and attestation
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.image }}
+          path: |
+            ${{ matrix.image }}.json
+            attestation.json
 
       - name: Setup go
         uses: actions/setup-go@v5
