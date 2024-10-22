@@ -66,12 +66,12 @@ jobs:
         shell: bash
         id: image-name
         run: |
-          echo "IMAGE_TAG=$(echo ${{ matrix.image }} | cut -d: -f2)" >> $GITHUB_ENV
+          echo "IMAGE_TAG=$(echo ${{ matrix.image }} | cut -d: -f1)" >> $GITHUB_ENV
 
       - name: Upload SBOM and attestation
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.image-name.outputs.IMAGE_TAG }}
+          name: ${{ env.IMAGE_TAG }}
           path: |
             sbom.json
             attestation.json
