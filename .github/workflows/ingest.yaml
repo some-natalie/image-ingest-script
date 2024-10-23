@@ -7,6 +7,7 @@ jobs:
   mirror:
     runs-on: ubuntu-latest
     strategy:
+      # trino:453 should fail the vulnerability scan
       matrix:
         image:
           [
