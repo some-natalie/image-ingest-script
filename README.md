@@ -3,8 +3,8 @@
 ```mermaid
 flowchart LR
     subgraph corporate network
-    A(fa:fa-laptop-code<br>developer)
-    B(fas:fa-boxes-stacked<br>internal<br>container registry)
+    A(👩🏻‍💻<br>developer)
+    B(📦<br>internal<br>container registry)
     end
     A -->| push new images | B
     B -->| pull base images | A
