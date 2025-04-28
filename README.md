@@ -1,20 +1,10 @@
 # image ingestion pipeline examples
 
-```mermaid
-flowchart LR
-    subgraph corporate network
-    A(👩🏻‍💻<br>developer)
-    B(📦<br>internal<br>container registry)
-    end
-    A -->| push new images | B
-    B -->| pull base images | A
-    subgraph internet
-    C(🐙<br>chainguard registry)
-    end
-    D{🔎 acceptance criteria<br>- CVE scans<br>- SBOM validation<br>- Sigstore validation}
-    D -->| pull tokens<br>or<br>OIDC | C
-    B --> D
-```
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="pictures/ingest-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="pictures/ingest-light.png">
+  <img alt="Cross-domain image promotion" src="pictures/ingest-light.png">
+</picture>
 
 Two paths are shown here, more as a demo than anything else.
 
